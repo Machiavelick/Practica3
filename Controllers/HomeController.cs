@@ -6,21 +6,42 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Practica3.Models;
+using Practica3.Data;
 
-namespace Practica3.Controllers
+namespace busco.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly RegistroContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(RegistroContext context)
         {
-            _logger = logger;
+            _context = context;
         }
-
-        public IActionResult Index()
+        public IActionResult Registro()
         {
             return View();
+        }
+        public IActionResult Index()
+        {
+            var registros = _context.Registros.Where(x => x.NombreUsuario != null).ToList();
+
+            return View(registros);
+        }
+
+        [HttpPost]
+        public IActionResult Registro(Registro c)
+        {
+            if (ModelState.IsValid) {
+
+                _context.Add(c);
+                _context.SaveChanges();
+
+             
+                return RedirectToAction("Index");
+            }
+
+            return View(c);
         }
 
         public IActionResult Privacy()
@@ -35,3 +56,4 @@ namespace Practica3.Controllers
         }
     }
 }
+
